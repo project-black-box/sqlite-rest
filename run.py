@@ -1,5 +1,10 @@
+import os
 import sqlite3
 from flask import Flask, jsonify
+
+#os.environ["FLASK_ENV"]="development"
+#os.environ["FLASK_DEBUG"]=1
+
 app = Flask(__name__)
 
 def get_primary_key(conn, table):
@@ -23,6 +28,16 @@ def get_select_statement(conn, table):
     # oh, yes, little bobby tables, we call him.
     return 'select * from {tbl} where {pk} = ?'.format(pk=primary_key, tbl=table)
 
+@app.route('/', methods=['GET'])
+def get_tables():
+    conn = sqlite3.connect("temp.db")
+    c = conn.cursor()
+    sql = 'SELECT name FROM sqlite_master WHERE type="table"'
+    rs = c.execute(sql)
+    result = {"data": rs.fetchall(), "error": {}}
+    conn.close()
+    return jsonify(result)
+
 @app.route('/<table>', methods=['GET'])
 def get_all(table):
     conn = sqlite3.connect("temp.db")
@@ -44,4 +59,4 @@ def get_join(table, id):
     return jsonify(result)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
