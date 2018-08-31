@@ -59,20 +59,23 @@ def get_join(table, id):
     conn.close()
     return jsonify(result)
 
-@app.route('/doc/', defaults={'path': ''})
-@app.route('/doc/<path:path>')
-def get_dir(path):
-    d = lambda x: {"table": x[0], "key": x[1]}
+def parse_path(path):
+    transform = lambda x: {"table": x[0], "key": x[1]}
     p = path.split('/')
 
     if len(p) % 2 == 1:
         p.append(None)
 
     rest = list(zip(p[::2], p[1::2]))
-    rest = [d(x) for x in rest]
-    rest = list(reversed(rest))
+    rest = [transform(x) for x in rest]
+    return list(reversed(rest))
 
-    return jsonify(rest)
+@app.route('/doc/', defaults={'path': ''})
+@app.route('/doc/<path:path>')
+def get_dir(path):
+    p = parse_path(path)
+    res = query(p)
+    return res
 
 if __name__ == '__main__':
     app.run(debug=True)
