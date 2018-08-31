@@ -1,6 +1,7 @@
 import os
 import sqlite3
 from flask import Flask, jsonify
+from sqliterest.db.schema import query
 
 #os.environ["FLASK_ENV"]="development"
 #os.environ["FLASK_DEBUG"]=1
@@ -57,6 +58,21 @@ def get_join(table, id):
     result = {"data": rs.fetchall(), "error": {}}
     conn.close()
     return jsonify(result)
+
+@app.route('/doc/', defaults={'path': ''})
+@app.route('/doc/<path:path>')
+def get_dir(path):
+    d = lambda x: {"table": x[0], "key": x[1]}
+    p = path.split('/')
+
+    if len(p) % 2 == 1:
+        p.append(None)
+
+    rest = list(zip(p[::2], p[1::2]))
+    rest = [d(x) for x in rest]
+    rest = list(reversed(rest))
+
+    return jsonify(rest)
 
 if __name__ == '__main__':
     app.run(debug=True)
