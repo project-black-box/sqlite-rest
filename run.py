@@ -60,7 +60,7 @@ def get_join(table, id):
     return jsonify(result)
 
 def parse_path(path):
-    transform = lambda x: {"table": x[0], "key": x[1]}
+    transform = lambda x: {"name": x[0], "key": x[1]}
     p = path.split('/')
 
     if len(p) % 2 == 1:
