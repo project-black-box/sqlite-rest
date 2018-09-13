@@ -75,7 +75,7 @@ def parse_path(path):
 def get_dir(path):
     p = parse_path(path)
     res = query(p)
-    return res
+    return jsonify(res)
 
 if __name__ == '__main__':
     app.run(debug=True)

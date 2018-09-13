@@ -20,10 +20,16 @@ Base.prepare(engine, reflect=True)
 #print (Album.__table__.primary_key)
 #print (Base.classes.keys())
 
-# /Artists/1
-# /Artists/1/Albums
-# /Artists/1/Albums/3
-# /Artists/1/Albums/3/Tracks
+# /Artist/1
+# /Artist/1/Album
+# /Artist/1/Album/3
+# /Artist/1/Album/3/Track
+
+def row2dict(row):
+  d = {}
+  for column in row.__table__.columns:
+    d[column.name] = str(getattr(row, column.name))
+  return d
 
 def get_mapping(table):
   return Base.classes[table['name']]
@@ -56,10 +62,6 @@ def query(tables):
   for t in tables[1::]:
     q = join(q, t)
 
-  print(q)
+  rest = [row2dict(x) for x in q.all()]
 
-  rest = [str(x) for x in q.all()]
-
-  print (rest)
-
-  return str(q)
+  return rest
